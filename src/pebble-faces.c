@@ -7,14 +7,23 @@ static BitmapLayer *bitmap_layer;
 static GBitmap *current_bmp;
 static TextLayer *s_time_layer; //the actual clock
 
-static char *images[] = {
+//color images list
+static char *colorImages[] = {
   "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/cande.PNG?raw=true",
   "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/republic.PNG?raw=true",
   "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/violator.PNG?raw=true",
-  "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/wish.PNG?raw=true"
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/wish.PNG?raw=true",
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/color/wms.PNG?raw=true"
 };
 
-
+//monochrome images list
+static char *monoImages[] = {
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/mono/cande.PNG?raw=true",
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/mono/republic.PNG?raw=true",
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/mono/violator.PNG?raw=true",
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/mono/wish.PNG?raw=true",
+  "https://github.com/JohnSpahr/CatCovers/blob/master/images/mono/wms.PNG?raw=true"
+};
 
 static void update_time() {
   // Get a tm structure
@@ -49,12 +58,26 @@ void show_next_image() {
     current_bmp = NULL;
   }
 
-  netdownload_request(images[image]);
-
-  image++;
-  if (image >= sizeof(images)/sizeof(char*)) {
+//WORK-IN-PROGRESS PART BELOW:
+  switch (PBL_PLATFORM_TYPE_CURRENT) {
+    case PlatformTypeAplite:
+      //monochrome pebbles
+      netdownload_request(monoImages[image]); //request faces from internet
+image++;
+  if (image >= sizeof(monoImages)/sizeof(char*)) {
     image = 0;
   }
+    break;
+    case PlatformTypeBasalt:
+      //color pebbles
+      netdownload_request(colorImages[image]); //request faces from internet
+image++;
+  if (image >= sizeof(colorImages)/sizeof(char*)) {
+    image = 0;
+  }
+    break;
+  }
+
 }
 
 static void window_load(Window *window) {
@@ -74,7 +97,7 @@ static void window_load(Window *window) {
 
   //create clock text layer...
   s_time_layer = text_layer_create(
-      GRect(0, 140, bounds.size.w, bounds.size.h));
+      GRect(0, 138, bounds.size.w, bounds.size.h));
 
   //various setup stuff...
   text_layer_set_background_color(s_time_layer, GColorBlack);
@@ -85,6 +108,7 @@ static void window_load(Window *window) {
 
   //add clock text layer to window layer
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+
 
 }
 
